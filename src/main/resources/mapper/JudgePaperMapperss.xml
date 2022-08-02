@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.judgepaper.mapper.JudgePaperMapper">
+
+    <select id="findQuestionByPaperId" resultType="com.example.judgepaper.Dto.ResponseDto.Question">
+        SELECT qp.que_id que_id,qt.`name` que_type,q.score que_score,aa.content answers
+        FROM question_paper qp,
+             question q,question_type qt,
+             alternative_answer aa
+        WHERE qp.pap_id = #{id} AND
+              qp.que_id = q.que_id AND q.que_typ_id = qt.que_typ_id AND
+              q.que_id = aa.que_id AND aa.`right` = #{rightFlag}
+        GROUP BY qp.que_id
+    </select>
+
+    <select id="findStudentAnswer" resultType="com.example.judgepaper.Dto.ResponseDto.StudentAnswerDto">
+        SELECT rd.que_res questionResult,
+               rd.paperId paperId,rd.testId testId,rd.studentId studentId
+        FROM result_detail rd
+        WHERE rd.paperId = #{paperid} AND rd.studentId = #{studentid} AND rd.testId = #{testid}
+    </select>
+</mapper>

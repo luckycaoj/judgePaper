@@ -1,0 +1,24 @@
+# JudgePaper Service Port
+server:
+  port: 10010
+
+#DB Configuration:
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://39.99.148.46:3306/examsystem?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+    username: root
+    password: 20005613
+    # 数据库连接池
+    # Spring Boot官方推荐的数据库连接池是Hikari，从一些第三方的评测结果看，Hikari的性能比Druid要好，但是Druid自带各种监控工具，背后又有阿里一直在为它背书
+    # hikari数据源配置，
+    hikari:
+      connection-test-query: SELECT 1 FROM teacher
+      connection-timeout: 10000
+      maximum-pool-size: 10
+      max-lifetime: 600000
+      minimum-idle: 5
+
+mybatis:
+  #Scan All mybatis .xml Document
+  mapper-locations: classpath:mapper/*.xml
