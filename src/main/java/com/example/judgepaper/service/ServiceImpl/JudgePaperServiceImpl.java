@@ -3,6 +3,7 @@ package com.example.judgepaper.service.ServiceImpl;
 import com.example.judgepaper.Dto.ResponseDto.*;
 import com.example.judgepaper.mapper.JudgePaperMapper;
 import com.example.judgepaper.service.JudgePaperService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 @Service
 @Transactional
 public class JudgePaperServiceImpl implements JudgePaperService {
@@ -263,4 +265,47 @@ public class JudgePaperServiceImpl implements JudgePaperService {
         return judgeAnswerPartDto;
     }
 
+    @Override
+    public boolean studentScoreInsert(JudgeAnswerPartDto judgeAnswerPartDto,
+                                      PaperAnswerDto paperAnswerDto,
+                                      StudentAnswerDto studentAnswerDto) {
+        Integer writeSize = paperAnswerDto.getPaperAnswerPartDto().getQuestionSize().getWriteSize();
+        StringBuilder stringBuffer = new StringBuilder();
+        int stringBufferSize;
+        QuestionScore questionScore = judgeAnswerPartDto.getQuestionScore();
+        for (Integer integer : questionScore.getSelectScoreList()) {
+            stringBuffer.append(integer);
+            stringBuffer.append("@￥#S@");
+        }
+        stringBufferSize = stringBuffer.length();
+        stringBuffer.delete(stringBufferSize - 5, stringBufferSize);
+        stringBuffer.append("@fg@");
+        for (Integer integer : questionScore.getJudgeScoreList()) {
+            stringBuffer.append(integer);
+            stringBuffer.append("@￥#J@");
+        }
+        stringBufferSize = stringBuffer.length();
+        stringBuffer.delete(stringBufferSize - 5, stringBufferSize);
+        stringBuffer.append("@fg@");
+        for (Integer integer : questionScore.getFillScoreList()) {
+            stringBuffer.append(integer);
+            stringBuffer.append("@￥#F@");
+        }
+        stringBufferSize = stringBuffer.length();
+        stringBuffer.delete(stringBufferSize - 5, stringBufferSize);
+        stringBuffer.append("@fg@");
+        if (writeSize > 0) {
+            for (int i = 0; i < writeSize; i++) {
+                stringBuffer.append("-1");
+                stringBuffer.append("@￥#W@");
+            }
+            stringBufferSize = stringBuffer.length();
+            stringBuffer.delete(stringBufferSize - 5, stringBufferSize);
+        }
+        return judgePaperMapper
+                .studentScoreInsert(stringBuffer.toString(),
+                        studentAnswerDto.getTestId(),
+                        studentAnswerDto.getPaperId(),
+                        studentAnswerDto.getStudentId());
+    }
 }

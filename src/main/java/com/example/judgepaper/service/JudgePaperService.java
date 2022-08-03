@@ -28,4 +28,8 @@ public interface JudgePaperService {
      */
     JudgeAnswerPartDto judgePaper(StudentAnswerDto studentAnswerDto,
                               PaperAnswerDto paperResponseDto);
+
+    boolean studentScoreInsert(JudgeAnswerPartDto judgeAnswerPartDto,
+                               PaperAnswerDto paperAnswerDto,
+                               StudentAnswerDto studentAnswerDto);
 }

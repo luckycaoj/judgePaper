@@ -31,4 +31,8 @@ public interface JudgePaperMapper {
                                        @Param("paperid") String paperId,
                                        @Param("studentid") String studentId);
 
+    boolean studentScoreInsert(@Param("score") String TestScore,
+                               @Param("testid") String testId,
+                               @Param("paperid") String paperId,
+                               @Param("studentid") String studentId);
 }

@@ -23,7 +23,6 @@ public class JudgePaperController {
         if(allMassage == null){
             return new Result<>(500, "查无此卷", null);
         }else {
-
             return new Result<>(200, "查询成功", allMassage);
         }
     }
@@ -46,6 +45,11 @@ public class JudgePaperController {
         StudentAnswerDto studentAnswerDto = judgePaperService
                 .findStudentResult(testId, paperId, studentId);
         JudgeAnswerPartDto judgeAnswerPartDto = judgePaperService.judgePaper(studentAnswerDto, paperAnswerDto);
-        return new Result<>(200, "查询成功", judgeAnswerPartDto);
+        boolean flag = judgePaperService.studentScoreInsert(judgeAnswerPartDto, paperAnswerDto,studentAnswerDto);
+        if(flag && judgeAnswerPartDto!=null){
+            return new Result<>(200, "查询且插入成功", judgeAnswerPartDto);
+        }
+        else
+            return new Result<>(500,"判卷出错，请检查后端",null);
     }
 }
