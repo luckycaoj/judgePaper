@@ -3,6 +3,7 @@ package com.example.judgepaper.controller;
 import com.example.judgepaper.Dto.ResponseDto.JudgeAnswerPartDto;
 import com.example.judgepaper.Dto.ResponseDto.PaperAnswerDto;
 import com.example.judgepaper.Dto.ResponseDto.StudentAnswerDto;
+import com.example.judgepaper.Dto.ResponseDto.TwoData;
 import com.example.judgepaper.service.JudgePaperService;
 import com.example.judgepaper.util.Result;
 import org.springframework.web.bind.annotation.*;
@@ -45,11 +46,14 @@ public class JudgePaperController {
         StudentAnswerDto studentAnswerDto = judgePaperService
                 .findStudentResult(testId, paperId, studentId);
         JudgeAnswerPartDto judgeAnswerPartDto = judgePaperService.judgePaper(studentAnswerDto, paperAnswerDto);
-        boolean flag = judgePaperService.studentScoreInsert(judgeAnswerPartDto, paperAnswerDto,studentAnswerDto);
-        if(flag && judgeAnswerPartDto!=null){
+        TwoData twoData = judgePaperService.studentScoreUpdate(judgeAnswerPartDto, paperAnswerDto, studentAnswerDto);
+        if(!twoData.isFlag()){
+            return new Result<>(501,"已经进行过一次自动判卷，请勿重复操作",null);
+        }
+        else if(twoData.isFlag() && judgeAnswerPartDto!=null){
             return new Result<>(200, "查询且插入成功", judgeAnswerPartDto);
         }
         else
-            return new Result<>(500,"判卷出错，请检查后端",null);
+            return new Result<>(500,"判卷出错",null);
     }
 }

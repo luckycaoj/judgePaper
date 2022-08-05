@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.judgepaper.mapper.ChangeScoreMapper">
+    <update id="updateScore">
+        UPDATE result_detail
+        SET test_stu_score = #{score}
+        WHERE studentId = #{studentid} and testId = #{testid}
+    </update>
+
+    <select id="getScoreString" resultType="com.example.judgepaper.Dto.ResponseDto.Change.ChangeQuestionList">
+        SELECT rd.test_stu_score studentScore
+        FROM result_detail rd
+        WHERE rd.studentId = #{studentid} AND rd.testId = #{testid}
+    </select>
+
+</mapper>

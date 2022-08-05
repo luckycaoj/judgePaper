@@ -31,6 +31,14 @@ public interface JudgePaperMapper {
                                        @Param("paperid") String paperId,
                                        @Param("studentid") String studentId);
 
+    /**
+     * 自动判卷后，并将分值插入
+     * @param TestScore
+     * @param testId
+     * @param paperId
+     * @param studentId
+     * @return
+     */
     boolean studentScoreInsert(@Param("score") String TestScore,
                                @Param("testid") String testId,
                                @Param("paperid") String paperId,

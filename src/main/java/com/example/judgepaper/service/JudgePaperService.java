@@ -29,7 +29,7 @@ public interface JudgePaperService {
     JudgeAnswerPartDto judgePaper(StudentAnswerDto studentAnswerDto,
                               PaperAnswerDto paperResponseDto);
 
-    boolean studentScoreInsert(JudgeAnswerPartDto judgeAnswerPartDto,
+    TwoData studentScoreUpdate(JudgeAnswerPartDto judgeAnswerPartDto,
                                PaperAnswerDto paperAnswerDto,
                                StudentAnswerDto studentAnswerDto);
 }

@@ -1,6 +1,7 @@
 package com.example.judgepaper.service.ServiceImpl;
 
 import com.example.judgepaper.Dto.ResponseDto.*;
+import com.example.judgepaper.mapper.ChangeScoreMapper;
 import com.example.judgepaper.mapper.JudgePaperMapper;
 import com.example.judgepaper.service.JudgePaperService;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +19,11 @@ import java.util.List;
 public class JudgePaperServiceImpl implements JudgePaperService {
 
     private final JudgePaperMapper judgePaperMapper;
+    private final ChangeScoreMapper changeScoreMapper;
 
-    public JudgePaperServiceImpl(JudgePaperMapper judgePaperMapper) {
+    public JudgePaperServiceImpl(JudgePaperMapper judgePaperMapper, ChangeScoreMapper changeScoreMapper) {
         this.judgePaperMapper = judgePaperMapper;
+        this.changeScoreMapper = changeScoreMapper;
     }
 
     /**
@@ -266,13 +269,14 @@ public class JudgePaperServiceImpl implements JudgePaperService {
     }
 
     @Override
-    public boolean studentScoreInsert(JudgeAnswerPartDto judgeAnswerPartDto,
+    public TwoData studentScoreUpdate(JudgeAnswerPartDto judgeAnswerPartDto,
                                       PaperAnswerDto paperAnswerDto,
                                       StudentAnswerDto studentAnswerDto) {
         Integer writeSize = paperAnswerDto.getPaperAnswerPartDto().getQuestionSize().getWriteSize();
         StringBuilder stringBuffer = new StringBuilder();
         int stringBufferSize;
         QuestionScore questionScore = judgeAnswerPartDto.getQuestionScore();
+        //选择
         for (Integer integer : questionScore.getSelectScoreList()) {
             stringBuffer.append(integer);
             stringBuffer.append("@￥#S@");
@@ -280,6 +284,7 @@ public class JudgePaperServiceImpl implements JudgePaperService {
         stringBufferSize = stringBuffer.length();
         stringBuffer.delete(stringBufferSize - 5, stringBufferSize);
         stringBuffer.append("@fg@");
+        //判断
         for (Integer integer : questionScore.getJudgeScoreList()) {
             stringBuffer.append(integer);
             stringBuffer.append("@￥#J@");
@@ -287,6 +292,7 @@ public class JudgePaperServiceImpl implements JudgePaperService {
         stringBufferSize = stringBuffer.length();
         stringBuffer.delete(stringBufferSize - 5, stringBufferSize);
         stringBuffer.append("@fg@");
+        //填空
         for (Integer integer : questionScore.getFillScoreList()) {
             stringBuffer.append(integer);
             stringBuffer.append("@￥#F@");
@@ -294,6 +300,7 @@ public class JudgePaperServiceImpl implements JudgePaperService {
         stringBufferSize = stringBuffer.length();
         stringBuffer.delete(stringBufferSize - 5, stringBufferSize);
         stringBuffer.append("@fg@");
+        //简答
         if (writeSize > 0) {
             for (int i = 0; i < writeSize; i++) {
                 stringBuffer.append("-1");
@@ -302,10 +309,24 @@ public class JudgePaperServiceImpl implements JudgePaperService {
             stringBufferSize = stringBuffer.length();
             stringBuffer.delete(stringBufferSize - 5, stringBufferSize);
         }
-        return judgePaperMapper
-                .studentScoreInsert(stringBuffer.toString(),
-                        studentAnswerDto.getTestId(),
-                        studentAnswerDto.getPaperId(),
-                        studentAnswerDto.getStudentId());
+        boolean flag;
+        int length = changeScoreMapper.getScoreString(studentAnswerDto.getStudentId(), studentAnswerDto.getTestId())
+                .getStudentScore().length();
+        if (length > 0) {
+            TwoData twoData = new TwoData();
+            twoData.setFlag(false);
+            return twoData;
+        } else {
+            flag = judgePaperMapper
+                    .studentScoreInsert(stringBuffer.toString(),
+                            studentAnswerDto.getTestId(),
+                            studentAnswerDto.getPaperId(),
+                            studentAnswerDto.getStudentId());
+            TwoData twoData = new TwoData();
+            twoData.setFlag(flag);
+            twoData.setStringBuilder(stringBuffer);
+            return twoData;
+        }
     }
+
 }
