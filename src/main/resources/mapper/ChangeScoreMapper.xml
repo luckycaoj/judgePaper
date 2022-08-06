@@ -3,12 +3,12 @@
 <mapper namespace="com.example.judgepaper.mapper.ChangeScoreMapper">
     <update id="updateScore">
         UPDATE result_detail
-        SET test_stu_score = #{score}
+        SET test_stu_score = #{score},total_score = #{sum}
         WHERE studentId = #{studentid} and testId = #{testid}
     </update>
 
     <select id="getScoreString" resultType="com.example.judgepaper.Dto.ResponseDto.Change.ChangeQuestionList">
-        SELECT rd.test_stu_score studentScore
+        SELECT rd.test_stu_score studentScore,rd.total_score totalScore
         FROM result_detail rd
         WHERE rd.studentId = #{studentid} AND rd.testId = #{testid}
     </select>

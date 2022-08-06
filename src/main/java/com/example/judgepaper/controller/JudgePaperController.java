@@ -4,9 +4,13 @@ import com.example.judgepaper.Dto.ResponseDto.JudgeAnswerPartDto;
 import com.example.judgepaper.Dto.ResponseDto.PaperAnswerDto;
 import com.example.judgepaper.Dto.ResponseDto.StudentAnswerDto;
 import com.example.judgepaper.Dto.ResponseDto.TwoData;
+import com.example.judgepaper.service.ChangeScoreService;
 import com.example.judgepaper.service.JudgePaperService;
 import com.example.judgepaper.util.Result;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/judge")
@@ -45,13 +49,15 @@ public class JudgePaperController {
                 .findAllMassage(paperId);
         StudentAnswerDto studentAnswerDto = judgePaperService
                 .findStudentResult(testId, paperId, studentId);
-        JudgeAnswerPartDto judgeAnswerPartDto = judgePaperService.judgePaper(studentAnswerDto, paperAnswerDto);
-        TwoData twoData = judgePaperService.studentScoreUpdate(judgeAnswerPartDto, paperAnswerDto, studentAnswerDto);
+        JudgeAnswerPartDto judgeAnswerPartDto = judgePaperService
+                .judgePaper(studentAnswerDto, paperAnswerDto);
+        TwoData twoData = judgePaperService
+                .studentScoreUpdate(judgeAnswerPartDto, paperAnswerDto, studentAnswerDto);
         if(!twoData.isFlag()){
-            return new Result<>(501,"已经进行过一次自动判卷，请勿重复操作",null);
+            return new Result<>(501,"已经进行过一次自动判卷，这是改后的分数",twoData.getJudgeAnswerPartDto());
         }
         else if(twoData.isFlag() && judgeAnswerPartDto!=null){
-            return new Result<>(200, "查询且插入成功", judgeAnswerPartDto);
+            return new Result<>(200, "这是第一次判卷,判卷成功", twoData.getJudgeAnswerPartDto());
         }
         else
             return new Result<>(500,"判卷出错",null);

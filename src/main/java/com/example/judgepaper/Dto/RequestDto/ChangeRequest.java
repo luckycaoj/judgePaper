@@ -7,5 +7,5 @@ public class ChangeRequest {
     private String testId;
     private String studentId;
     private String questionNum;
-    private String score;
+    private Integer score;
 }

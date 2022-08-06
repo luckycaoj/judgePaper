@@ -5,4 +5,5 @@ import lombok.Data;
 @Data
 public class ChangeQuestionList {
     private String studentScore;
+    private Double totalScore;
 }

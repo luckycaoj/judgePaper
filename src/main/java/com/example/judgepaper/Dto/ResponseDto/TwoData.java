@@ -5,5 +5,6 @@ import lombok.Data;
 @Data
 public class TwoData {
     boolean flag;
-    StringBuilder stringBuilder;
+    private StringBuilder stringBuilder;
+    private JudgeAnswerPartDto judgeAnswerPartDto;
 }

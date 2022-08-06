@@ -13,5 +13,6 @@ public interface ChangeScoreMapper {
 
     boolean updateScore(@Param("studentid") String studentId,
                         @Param("testid") String testId,
-                        @Param("score") String score);
+                        @Param("score") String score,
+                        @Param("sum") Double scoreS);
 }

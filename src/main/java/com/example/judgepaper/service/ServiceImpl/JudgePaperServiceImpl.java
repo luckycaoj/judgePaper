@@ -1,8 +1,11 @@
 package com.example.judgepaper.service.ServiceImpl;
 
 import com.example.judgepaper.Dto.ResponseDto.*;
+import com.example.judgepaper.Dto.ResponseDto.Change.ChangeQuestionList;
+import com.example.judgepaper.Dto.ResponseDto.Change.StudentScorePart;
 import com.example.judgepaper.mapper.ChangeScoreMapper;
 import com.example.judgepaper.mapper.JudgePaperMapper;
+import com.example.judgepaper.service.ChangeScoreService;
 import com.example.judgepaper.service.JudgePaperService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,16 +23,20 @@ public class JudgePaperServiceImpl implements JudgePaperService {
 
     private final JudgePaperMapper judgePaperMapper;
     private final ChangeScoreMapper changeScoreMapper;
+    private final ChangeScoreService changeScoreService;
 
-    public JudgePaperServiceImpl(JudgePaperMapper judgePaperMapper, ChangeScoreMapper changeScoreMapper) {
+    public JudgePaperServiceImpl(JudgePaperMapper judgePaperMapper,
+                                 ChangeScoreMapper changeScoreMapper,
+                                 ChangeScoreService changeScoreService) {
         this.judgePaperMapper = judgePaperMapper;
         this.changeScoreMapper = changeScoreMapper;
+        this.changeScoreService = changeScoreService;
     }
 
     /**
-     * 业务逻辑
-     * 1.1 在paper中查找试卷
-     * 1.2 在paper_question中找试卷对应的题目
+     * 根据paperId获取试卷的各题答案
+     * @param id
+     * @return
      */
     @Override
     public PaperAnswerDto findAllMassage(String id) {
@@ -133,6 +140,13 @@ public class JudgePaperServiceImpl implements JudgePaperService {
         }
     }
 
+    /**
+     * 根据以下属性，查找到学生答案，并将其转为题型题目列表
+     * @param testId
+     * @param paperId
+     * @param studentId
+     * @return
+     */
     @Override
     public StudentAnswerDto findStudentResult
             (String testId, String paperId, String studentId) {
@@ -174,6 +188,12 @@ public class JudgePaperServiceImpl implements JudgePaperService {
         return studentAnswer;
     }
 
+    /**
+     * 初次判卷的操作
+     * @param studentAnswerDto
+     * @param paperAnswerDto
+     * @return
+     */
     @Override
     public JudgeAnswerPartDto judgePaper
             (StudentAnswerDto studentAnswerDto, PaperAnswerDto paperAnswerDto) {
@@ -268,55 +288,78 @@ public class JudgePaperServiceImpl implements JudgePaperService {
         return judgeAnswerPartDto;
     }
 
+    /**
+     * 判卷后的返回结果，包括了已经判卷过和未判卷的两种处理情况
+     * @param judgeAnswerPartDto
+     * @param paperAnswerDto
+     * @param studentAnswerDto
+     * @return
+     */
     @Override
     public TwoData studentScoreUpdate(JudgeAnswerPartDto judgeAnswerPartDto,
                                       PaperAnswerDto paperAnswerDto,
                                       StudentAnswerDto studentAnswerDto) {
-        Integer writeSize = paperAnswerDto.getPaperAnswerPartDto().getQuestionSize().getWriteSize();
-        StringBuilder stringBuffer = new StringBuilder();
-        int stringBufferSize;
-        QuestionScore questionScore = judgeAnswerPartDto.getQuestionScore();
-        //选择
-        for (Integer integer : questionScore.getSelectScoreList()) {
-            stringBuffer.append(integer);
-            stringBuffer.append("@￥#S@");
-        }
-        stringBufferSize = stringBuffer.length();
-        stringBuffer.delete(stringBufferSize - 5, stringBufferSize);
-        stringBuffer.append("@fg@");
-        //判断
-        for (Integer integer : questionScore.getJudgeScoreList()) {
-            stringBuffer.append(integer);
-            stringBuffer.append("@￥#J@");
-        }
-        stringBufferSize = stringBuffer.length();
-        stringBuffer.delete(stringBufferSize - 5, stringBufferSize);
-        stringBuffer.append("@fg@");
-        //填空
-        for (Integer integer : questionScore.getFillScoreList()) {
-            stringBuffer.append(integer);
-            stringBuffer.append("@￥#F@");
-        }
-        stringBufferSize = stringBuffer.length();
-        stringBuffer.delete(stringBufferSize - 5, stringBufferSize);
-        stringBuffer.append("@fg@");
-        //简答
-        if (writeSize > 0) {
-            for (int i = 0; i < writeSize; i++) {
-                stringBuffer.append("-1");
-                stringBuffer.append("@￥#W@");
-            }
-            stringBufferSize = stringBuffer.length();
-            stringBuffer.delete(stringBufferSize - 5, stringBufferSize);
-        }
         boolean flag;
-        int length = changeScoreMapper.getScoreString(studentAnswerDto.getStudentId(), studentAnswerDto.getTestId())
-                .getStudentScore().length();
+        ChangeQuestionList scoreString = changeScoreMapper
+                .getScoreString(studentAnswerDto.getStudentId(), studentAnswerDto.getTestId());
+        int length = scoreString.getStudentScore().length();
         if (length > 0) {
             TwoData twoData = new TwoData();
             twoData.setFlag(false);
+            QuestionScore questionScore = new QuestionScore();
+            StudentScorePart scoreList = changeScoreService
+                    .getScoreList(studentAnswerDto.getTestId(), studentAnswerDto.getStudentId());
+            //四大题型分数赋值
+            questionScore.setSelectScore(scoreList.getSelectScore());
+            questionScore.setJudgeScore(scoreList.getJudgeScore());
+            questionScore.setFillScore(scoreList.getFillScore());
+            questionScore.setWriteScore(scoreList.getWriteScore());
+            //四大题型得分列表
+            questionScore.setSelectScoreList(scoreList.getSelectResultList());
+            questionScore.setJudgeScoreList(scoreList.getJudgeResultList());
+            questionScore.setFillScoreList(scoreList.getFillResultList());
+            questionScore.setWriteScoreList(scoreList.getWriteResultList());
+            judgeAnswerPartDto.setQuestionScore(questionScore);
+            twoData.setJudgeAnswerPartDto(judgeAnswerPartDto);
             return twoData;
         } else {
+            Integer writeSize = paperAnswerDto.getPaperAnswerPartDto().getQuestionSize().getWriteSize();
+            StringBuilder stringBuffer = new StringBuilder();
+            int stringBufferSize;
+            QuestionScore questionScore = judgeAnswerPartDto.getQuestionScore();
+            //选择
+            for (Integer integer : questionScore.getSelectScoreList()) {
+                stringBuffer.append(integer);
+                stringBuffer.append("@￥#S@");
+            }
+            stringBufferSize = stringBuffer.length();
+            stringBuffer.delete(stringBufferSize - 5, stringBufferSize);
+            stringBuffer.append("@fg@");
+            //判断
+            for (Integer integer : questionScore.getJudgeScoreList()) {
+                stringBuffer.append(integer);
+                stringBuffer.append("@￥#J@");
+            }
+            stringBufferSize = stringBuffer.length();
+            stringBuffer.delete(stringBufferSize - 5, stringBufferSize);
+            stringBuffer.append("@fg@");
+            //填空
+            for (Integer integer : questionScore.getFillScoreList()) {
+                stringBuffer.append(integer);
+                stringBuffer.append("@￥#F@");
+            }
+            stringBufferSize = stringBuffer.length();
+            stringBuffer.delete(stringBufferSize - 5, stringBufferSize);
+            stringBuffer.append("@fg@");
+            //简答
+            if (writeSize > 0) {
+                for (int i = 0; i < writeSize; i++) {
+                    stringBuffer.append("-1");
+                    stringBuffer.append("@￥#W@");
+                }
+                stringBufferSize = stringBuffer.length();
+                stringBuffer.delete(stringBufferSize - 5, stringBufferSize);
+            }
             flag = judgePaperMapper
                     .studentScoreInsert(stringBuffer.toString(),
                             studentAnswerDto.getTestId(),
@@ -325,6 +368,7 @@ public class JudgePaperServiceImpl implements JudgePaperService {
             TwoData twoData = new TwoData();
             twoData.setFlag(flag);
             twoData.setStringBuilder(stringBuffer);
+            twoData.setJudgeAnswerPartDto(judgeAnswerPartDto);
             return twoData;
         }
     }
