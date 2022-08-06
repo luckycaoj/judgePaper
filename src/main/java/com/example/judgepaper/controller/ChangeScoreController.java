@@ -1,10 +1,12 @@
 package com.example.judgepaper.controller;
 
 import com.example.judgepaper.Dto.RequestDto.ChangeRequest;
-import com.example.judgepaper.Dto.ResponseDto.Change.StudentScorePart;
 import com.example.judgepaper.service.ChangeScoreService;
 import com.example.judgepaper.util.Result;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/change")
@@ -14,14 +16,6 @@ public class ChangeScoreController {
 
     public ChangeScoreController(ChangeScoreService changeScoreService) {
         this.changeScoreService = changeScoreService;
-    }
-
-    @GetMapping(value = "/get")
-    public Result<Object> getScore(@RequestParam("testid") String testId,
-                                   @RequestParam("studentid") String studentId){
-        StudentScorePart scoreList = changeScoreService
-                .getScoreList(testId, studentId);
-        return new Result<>(200,"学生分数信息",scoreList);
     }
 
     @PostMapping(value = "/update")

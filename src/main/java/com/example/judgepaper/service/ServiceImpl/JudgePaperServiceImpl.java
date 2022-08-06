@@ -57,6 +57,12 @@ public class JudgePaperServiceImpl implements JudgePaperService {
             int judgeScore = 0;
             int fillScore = 0;
             int writeScore = 0;
+            //不同题型中题目所对应的questionId
+            QuestionIdLists questionIdLists = new QuestionIdLists();
+            List<String> selectIds = new ArrayList<>();
+            List<String> judgeIds = new ArrayList<>();
+            List<String> fillIds = new ArrayList<>();
+            List<String> writeIds = new ArrayList<>();
             /* 对答案各题型进行分类
              1.1 分别创建PaperAnswerPartDto中的字符串列表和字符串列表列表的接收对象
              1.2 在循环遍历中依次在字符串列表或字符串列表列表中追加答案
@@ -78,14 +84,20 @@ public class JudgePaperServiceImpl implements JudgePaperService {
                 switch (question.getQue_type()) {
                     case "选择题":
                         //2.1 提取出选择题的正确选项
+                        //题目的分数
                         selectScoreList.add(question.getQue_score());
+                        //题目的Id
+                        selectIds.add(question.getQue_id());
+                        //题型的总分
                         selectScore = selectScore + question.getQue_score();
+                        //正确答案
                         String selectAnswer = question.getAnswers().substring(indexStart, indexStart + 1);
                         selectResultList.add(selectAnswer);
                         break;
                     case "填空题":
                         //2.2 提取出填空题的答案
                         OneFillScoreList.add(question.getQue_score());
+                        fillIds.add(question.getQue_id());
                         fillScore = fillScore + question.getQue_score();
                         String fillAnswerString = question.getAnswers().substring(indexStart, indexEnd);
                         String[] fillAnswerGroup = fillAnswerString.split("&nbsp");
@@ -98,6 +110,7 @@ public class JudgePaperServiceImpl implements JudgePaperService {
                     case "判断题":
                         //1.3 提取判断题的答案
                         judgeScoreList.add(question.getQue_score());
+                        judgeIds.add(question.getQue_id());
                         judgeScore = judgeScore + question.getQue_score();
                         String judgeAnswer = question.getAnswers().substring(indexStart, indexEnd);
                         if (judgeAnswer.equals("√")) {
@@ -110,6 +123,7 @@ public class JudgePaperServiceImpl implements JudgePaperService {
                     case "简答题":
                         //1.4 简答题的个数和分值
                         writeScoreList.add(question.getQue_score());
+                        writeIds.add(question.getQue_id());
                         writeScore = writeScore + question.getQue_score();
                 }
             }
@@ -132,9 +146,15 @@ public class JudgePaperServiceImpl implements JudgePaperService {
             questionScore.setFillScore(fillScore);
             questionScore.setJudgeScore(judgeScore);
             questionScore.setWriteScore(writeScore);
+            //各题目的id
+            questionIdLists.setSelectIdList(selectIds);
+            questionIdLists.setJudgeIdList(judgeIds);
+            questionIdLists.setFillIdList(fillIds);
+            questionIdLists.setWriteIdList(writeIds);
             //设置试卷的返回值
             paperAnswerPartDto.setQuestionSize(questionSize);
             paperAnswerPartDto.setQuestionScore(questionScore);
+            paperAnswerPartDto.setQuestionIdLists(questionIdLists);
             paperAnswerDto.setPaperAnswerPartDto(paperAnswerPartDto);
             return paperAnswerDto;
         }

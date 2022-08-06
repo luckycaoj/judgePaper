@@ -13,4 +13,5 @@ public class PaperAnswerPartDto {
 
     private QuestionSize questionSize;
     private QuestionScore questionScore;
+    private QuestionIdLists questionIdLists;
 }
