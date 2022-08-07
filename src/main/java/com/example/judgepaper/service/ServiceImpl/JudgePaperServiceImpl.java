@@ -146,6 +146,7 @@ public class JudgePaperServiceImpl implements JudgePaperService {
             questionScore.setFillScore(fillScore);
             questionScore.setJudgeScore(judgeScore);
             questionScore.setWriteScore(writeScore);
+            questionScore.setSumScore(selectScore+fillScore+judgeScore+writeScore);
             //各题目的id
             questionIdLists.setSelectIdList(selectIds);
             questionIdLists.setJudgeIdList(judgeIds);
@@ -334,6 +335,10 @@ public class JudgePaperServiceImpl implements JudgePaperService {
             questionScore.setJudgeScore(scoreList.getJudgeScore());
             questionScore.setFillScore(scoreList.getFillScore());
             questionScore.setWriteScore(scoreList.getWriteScore());
+            questionScore.setSumScore(scoreList.getFillScore()+
+                    scoreList.getSelectScore()+
+                    scoreList.getJudgeScore()+
+                    scoreList.getWriteScore());
             //四大题型得分列表
             questionScore.setSelectScoreList(scoreList.getSelectResultList());
             questionScore.setJudgeScoreList(scoreList.getJudgeResultList());
@@ -374,7 +379,7 @@ public class JudgePaperServiceImpl implements JudgePaperService {
             //简答
             if (writeSize > 0) {
                 for (int i = 0; i < writeSize; i++) {
-                    stringBuffer.append("-1");
+                    stringBuffer.append("0");
                     stringBuffer.append("@￥#W@");
                 }
                 stringBufferSize = stringBuffer.length();

@@ -4,7 +4,6 @@ import com.example.judgepaper.Dto.ResponseDto.JudgeAnswerPartDto;
 import com.example.judgepaper.Dto.ResponseDto.PaperAnswerDto;
 import com.example.judgepaper.Dto.ResponseDto.StudentAnswerDto;
 import com.example.judgepaper.Dto.ResponseDto.TwoData;
-import com.example.judgepaper.service.ChangeScoreService;
 import com.example.judgepaper.service.JudgePaperService;
 import com.example.judgepaper.util.Result;
 import org.springframework.web.bind.annotation.GetMapping;

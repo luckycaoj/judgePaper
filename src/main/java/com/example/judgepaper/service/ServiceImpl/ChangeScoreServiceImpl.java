@@ -115,6 +115,20 @@ public class ChangeScoreServiceImpl implements ChangeScoreService {
         scoreList.setJudgeResultList(strings1);
         scoreList.setFillResultList(strings2);
         scoreList.setWriteResultList(strings3);
+        Double sumScore = (double) 0;
+        for (Integer string : strings) {
+            sumScore+=string;
+        }
+        for (Integer integer : strings1) {
+            sumScore+=integer;
+        }
+        for (Integer integer : strings2) {
+            sumScore+=integer;
+        }
+        for (Integer integer : strings3) {
+            sumScore+=integer;
+        }
+        scoreList.setScore(sumScore);
         return scoreList;
     }
 

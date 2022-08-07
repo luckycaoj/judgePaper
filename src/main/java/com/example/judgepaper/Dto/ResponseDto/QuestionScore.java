@@ -15,4 +15,5 @@ public class QuestionScore {
     private Integer judgeScore;
     private Integer fillScore;
     private Integer writeScore;
+    private Integer sumScore;
 }
